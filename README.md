@@ -31,3 +31,12 @@ Copier les fichiers `bp-mannequin.css`, `bp-mannequin.js`, `mannequin.svg` et le
 ```
 
 Le script chargera automatiquement `/wp-content/uploads/presets/default.json` et initialisera le composant.
+
+## Hotspots + sélection de cartes (Elementor)
+
+Le fichier [`assets/q-hotspots-cards-snippet.html`](bespona-mannequin/assets/q-hotspots-cards-snippet.html) contient un bloc unique `<style>…</style><script>…</script>` prêt à être collé dans **Elementor → Custom Code** (ou un widget HTML). Il combine :
+
+- l'affichage conditionnel des sections `.q-section` via les hotspots `href="#q-…"` ou `data-target="q-…"` ;
+- la sélection exclusive des cartes `.q-card` par groupe `data-field` avec mise en évidence visuelle.
+
+Le JavaScript est idempotent, fonctionne en délégation d'évènements (mode capture) et conserve l'état même si Elementor réinjecte du DOM.

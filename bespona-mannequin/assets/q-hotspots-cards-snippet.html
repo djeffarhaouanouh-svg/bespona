@@ -1,0 +1,278 @@
+<style>
+.q-section {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.q-section.is-active {
+  display: flex;
+  opacity: 1;
+}
+
+.q-card.is-selected {
+  outline: 2px solid #ff2f92;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(255, 47, 146, 0.25);
+  border-radius: 12px;
+}
+
+.q-card:focus-visible {
+  outline: 2px solid #ff2f92;
+  outline-offset: 2px;
+}
+
+.q-card.is-selected:focus-visible {
+  box-shadow: 0 0 0 4px rgba(255, 47, 146, 0.25);
+}
+
+a[href^="#q-"] > img,
+a[href*="#q-"] > img,
+[data-target^="q-"] > img {
+  pointer-events: none;
+}
+</style>
+<script>
+(function () {
+  'use strict';
+
+  var root = document.documentElement;
+  if (root.dataset.qHotspotReady === '1') {
+    return;
+  }
+  root.dataset.qHotspotReady = '1';
+
+  var WARNED_KEY = 'qWarnedMissingField';
+
+  function ready(fn) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fn, { once: true });
+    } else {
+      fn();
+    }
+  }
+
+  function warn(message) {
+    if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+      console.warn('[q-hotspots]', message);
+    }
+  }
+
+  function toArray(list) {
+    return Array.prototype.slice.call(list || []);
+  }
+
+  function escapeAttr(value) {
+    if (window.CSS && typeof window.CSS.escape === 'function') {
+      return window.CSS.escape(value);
+    }
+    return String(value).replace(/"/g, '\\"');
+  }
+
+  function normalizeTargetId(id) {
+    if (!id && id !== 0) {
+      return '';
+    }
+    var str = String(id).trim();
+    if (!str) {
+      return '';
+    }
+    return str.charAt(0) === '#' ? str.slice(1) : str;
+  }
+
+  function smoothScrollIntoView(element) {
+    if (!element || typeof element.scrollIntoView !== 'function') {
+      return;
+    }
+
+    var rect = element.getBoundingClientRect();
+    var viewHeight = window.innerHeight || document.documentElement.clientHeight;
+    if (rect.top < 0 || rect.bottom > viewHeight) {
+      try {
+        element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch (error) {
+        element.scrollIntoView(true);
+      }
+    }
+  }
+
+  function showOnly(id, options) {
+    var opts = options || {};
+    var targetId = normalizeTargetId(id);
+    if (!targetId) {
+      warn('ID de section invalide fourni au hotspot.');
+      return null;
+    }
+
+    var sections = toArray(document.querySelectorAll('.q-section'));
+    if (!sections.length) {
+      warn('Aucune section .q-section trouvée dans la page.');
+      return null;
+    }
+
+    var found = null;
+    sections.forEach(function (section) {
+      var match = section.id === targetId;
+      section.classList.toggle('is-active', match);
+      if (match) {
+        found = section;
+      }
+    });
+
+    if (!found) {
+      warn('Section #' + targetId + ' introuvable.');
+      return null;
+    }
+
+    if (opts.scroll !== false) {
+      smoothScrollIntoView(found);
+    }
+
+    return found;
+  }
+
+  function ensureDefaultActive() {
+    var sections = toArray(document.querySelectorAll('.q-section'));
+    if (!sections.length) {
+      return;
+    }
+
+    var current = sections.find(function (section) {
+      return section.classList.contains('is-active') && section.id;
+    });
+    if (current) {
+      showOnly(current.id, { scroll: false });
+      return;
+    }
+
+    var preferred = sections.find(function (section) {
+      return section.id === 'q-poitrine';
+    });
+    var fallback = preferred || sections[0];
+
+    if (!fallback) {
+      return;
+    }
+
+    if (!fallback.id) {
+      warn('Section par défaut sans ID détectée.');
+      sections.forEach(function (section) {
+        if (section !== fallback) {
+          section.classList.remove('is-active');
+        }
+      });
+      fallback.classList.add('is-active');
+      return;
+    }
+
+    showOnly(fallback.id, { scroll: false });
+  }
+
+  function syncCardAccessibility() {
+    toArray(document.querySelectorAll('.q-card')).forEach(function (card) {
+      var selected = card.classList.contains('is-selected');
+      card.setAttribute('aria-pressed', selected ? 'true' : 'false');
+      var tag = card.tagName;
+      if (tag !== 'BUTTON' && tag !== 'A' && tag !== 'INPUT') {
+        if (!card.hasAttribute('role')) {
+          card.setAttribute('role', 'button');
+        }
+        if (!card.hasAttribute('tabindex')) {
+          card.setAttribute('tabindex', '0');
+        }
+      }
+    });
+  }
+
+  function selectCard(card) {
+    if (!card) {
+      return;
+    }
+
+    var field = card.getAttribute('data-field');
+    if (!field) {
+      if (!card.dataset[WARNED_KEY]) {
+        warn('Carte sans attribut data-field ignorée.');
+        card.dataset[WARNED_KEY] = '1';
+      }
+      return;
+    }
+
+    var selector = '.q-card[data-field="' + escapeAttr(field) + '"]';
+    var groupCards = toArray(document.querySelectorAll(selector));
+    groupCards.forEach(function (item) {
+      if (item !== card) {
+        item.classList.remove('is-selected');
+        item.setAttribute('aria-pressed', 'false');
+      }
+    });
+
+    card.classList.add('is-selected');
+    card.setAttribute('aria-pressed', 'true');
+  }
+
+  function handleClick(event) {
+    var hotspot = event.target.closest('[data-target^="q-"], a[href*="#q-"]');
+    if (hotspot) {
+      var targetId = hotspot.getAttribute('data-target');
+      if (!targetId && hotspot.tagName === 'A') {
+        var href = hotspot.getAttribute('href') || '';
+        var match = href.match(/#(q-[A-Za-z0-9_-]+)/);
+        if (match) {
+          targetId = match[1];
+        }
+      }
+
+      if (targetId) {
+        event.preventDefault();
+        showOnly(targetId);
+      }
+    }
+
+    var card = event.target.closest('.q-card');
+    if (card) {
+      selectCard(card);
+    }
+  }
+
+  function handleKeydown(event) {
+    if (event.defaultPrevented) {
+      return;
+    }
+    var card = event.target.closest('.q-card');
+    if (!card) {
+      return;
+    }
+    if (event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar') {
+      event.preventDefault();
+      selectCard(card);
+    }
+  }
+
+  function observeMutations() {
+    if (!('MutationObserver' in window) || !document.body) {
+      return;
+    }
+
+    var observer = new MutationObserver(function (mutations) {
+      for (var i = 0; i < mutations.length; i += 1) {
+        if (mutations[i].type === 'childList') {
+          ensureDefaultActive();
+          syncCardAccessibility();
+          break;
+        }
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  ready(function () {
+    ensureDefaultActive();
+    syncCardAccessibility();
+    document.addEventListener('click', handleClick, true);
+    document.addEventListener('keydown', handleKeydown, true);
+    observeMutations();
+  });
+})();
+</script>
