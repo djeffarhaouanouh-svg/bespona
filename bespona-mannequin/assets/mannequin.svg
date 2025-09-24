@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="800" viewBox="0 0 320 800" role="img" aria-labelledby="title desc">
+  <title id="title">Silhouette de mannequin</title>
+  <desc id="desc">Silhouette stylisée d'une personne, utilisée comme support pour les zones cliquables du mannequin interactif.</desc>
+  <defs>
+    <linearGradient id="bodyGradient" x1="0%" x2="0%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#464069" />
+      <stop offset="50%" stop-color="#322d4d" />
+      <stop offset="100%" stop-color="#221f35" />
+    </linearGradient>
+    <linearGradient id="limbGradient" x1="0%" x2="0%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#524c7a" />
+      <stop offset="100%" stop-color="#2b2644" />
+    </linearGradient>
+  </defs>
+  <g fill="url(#bodyGradient)">
+    <circle cx="160" cy="88" r="64" />
+    <path d="M160 164c-46 0-82 34-88 80L54 358c-3 22 12 42 34 45s41-12 44-34l10-70v148l-40 206c-4 22 12 44 34 48s44-12 48-34l16-98 16 98c4 22 26 36 48 32s38-26 34-48l-40-204V299l10 70c3 22 22 36 44 34s37-23 34-45l-18-114c-8-46-42-80-88-80z" />
+  </g>
+  <g fill="url(#limbGradient)">
+    <path d="M82 300c-12 0-22 9-24 21l-12 118c-3 26 16 48 42 51s48-16 51-42l6-78c1-12-8-24-21-26s-24 8-26 21l-2 26-2-36c-1-13-12-23-25-23z" />
+    <path d="M238 300c12 0 22 9 24 21l12 118c3 26-16 48-42 51s-48-16-51-42l-6-78c-1-12 8-24 21-26s24 8 26 21l2 26 2-36c1-13 12-23 25-23z" />
+    <path d="M122 616c-20 2-34 18-34 38v78c0 22 18 40 40 40s40-18 40-40v-98c0-12-11-22-23-19l-23 5z" />
+    <path d="M198 616c20 2 34 18 34 38v78c0 22-18 40-40 40s-40-18-40-40v-98c0-12 11-22 23-19l23 5z" />
+  </g>
+  <g fill="#fff" opacity="0.12">
+    <path d="M128 48c-14 6-26 16-34 30s-12 30-10 46c5-32 21-60 44-76z" />
+    <path d="M106 372c-10 30-14 64-14 98 0 8 0 16 1 24 4-54 21-103 49-146l-36 24z" />
+  </g>
+</svg>
