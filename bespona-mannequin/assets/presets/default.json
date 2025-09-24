@@ -1,0 +1,10 @@
+{
+  "image": "mannequin.svg",
+  "points": [
+    { "id": "face",     "label": "Face",      "top": 8.0,  "left": 49.5 },
+    { "id": "poitrine", "label": "Poitrine",  "top": 30.0, "left": 43.0 },
+    { "id": "hanche",   "label": "Hanche",    "top": 50.0, "left": 59.0 },
+    { "id": "cuisse",   "label": "Cuisse",    "top": 65.0, "left": 46.0 },
+    { "id": "pieds",    "label": "Pieds",     "top": 95.0, "left": 50.0 }
+  ]
+}
